@@ -34,13 +34,3 @@ void Note::setLocked(const bool& locked) {
 bool Note::getLocked() const {
     return locked;
 }
-
-bool Note::operator==(const Note& rightNote) const {
-    if (this->title == rightNote.getTitle()) {
-        return true;
-    }
-    return false;
-}
-
-
-

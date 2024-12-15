@@ -7,4 +7,10 @@ add_executable(Notes main.cpp
         Note.cpp
         Note.h
         NoteCollection.cpp
-        NoteCollection.h)
+        NoteCollection.h
+        CollectionGroup.cpp
+        CollectionGroup.h
+        Observer.cpp
+        Observer.h
+        Observable.cpp
+        Observable.h)

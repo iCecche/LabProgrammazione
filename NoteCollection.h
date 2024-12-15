@@ -7,19 +7,26 @@
 #include "Note.h"
 #include <string>
 #include <vector>
+
+#include "Observable.h"
 using namespace std;
 
-class NoteCollection {
+class NoteCollection : public Observable {
     public:
     explicit NoteCollection(const string& collectionName);
+    ~NoteCollection() override = default;
     void addNote(const shared_ptr<Note>& newNote);
     void removeNote(const string& title);
     const Note* getNote(const string& title) const;
     void printNote(string title) const;
-    void getNoteCount() const;
+    unsigned long getNumberOfNotes() const;
+    void attach(Observer *observer) override;
+    void detach(Observer *observer) override;
+    void notify() override;
     private:
     string collectionName;
     vector<shared_ptr<Note>> collection;
+    vector<Observer *> observers;
 };
 
 

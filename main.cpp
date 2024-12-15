@@ -1,4 +1,5 @@
 #include <iostream>
+#include "CollectionGroup.h"
 #include "NoteCollection.h"
 #include "Note.h"
 using namespace std;
@@ -8,16 +9,18 @@ unique_ptr<NoteCollection> createNoteCollection();
 
 int main() {
 
+    const auto observer = new CollectionGroup();
+    const auto collections = make_unique<vector<unique_ptr<NoteCollection>>>();
     const auto collection1 = make_unique<NoteCollection>("Preferiti");
     const auto collection2 = createNoteCollection();
     const auto note1 = createNode();
 
+    collection1->attach(observer);
+    collection2->attach(observer);
+
     collection1->addNote(note1);
     collection2->addNote(note1);
-    collection1->getNoteCount();
-    collection2->getNoteCount();
     collection1->removeNote(note1->getTitle());
-    collection1->getNoteCount();
     collection2->printNote(note1->getTitle());
     return 0;
 }
