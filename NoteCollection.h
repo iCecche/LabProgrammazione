@@ -20,6 +20,7 @@ class NoteCollection : public Observable {
     const Note* getNote(const string& title) const;
     void printNote(string title) const;
     unsigned long getNumberOfNotes() const;
+    string getCollectionName() const;
     void attach(Observer *observer) override;
     void detach(Observer *observer) override;
     void notify() override;
