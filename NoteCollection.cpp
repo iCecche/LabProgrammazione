@@ -34,17 +34,17 @@ void NoteCollection::removeNote(const string &title) {
     }
 }
 
-void NoteCollection::editNote(const string &title, const optional<string>& newTitle = nullopt, const optional<string>& newContent = nullopt) {
+void NoteCollection::editNote(const string &title, const optional<string>& newTitle, const optional<string>& newContent) {
     const auto it = find_if(this->collection.begin(), this->collection.end(), [&title](const auto note) {
         return note->getTitle() == title;
     });
 
     if (it != this->collection.end()) {
         if (it -> get() -> getLocked() == false) {
-            if (newTitle) {
+            if (newTitle != nullopt) {
                 it -> get() -> setTitle(*newTitle);
             }
-            if (newContent) {
+            if (newContent != nullopt) {
                 it -> get() -> setContent(*newContent);
             }
         }else {
