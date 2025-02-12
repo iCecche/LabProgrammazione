@@ -20,12 +20,16 @@ void NoteCollection::removeNote(const string &title) {
         return note->getTitle() == title;
     });
 
-    if (it != this->collection.end() && it->get()->getLocked() == false) {
-        this->collection.erase(it);
-        cout << this->collectionName << " ha rimosso un elemento" << endl;
-        notify();
+    if (it != this->collection.end()) {
+        if (it -> get() -> getLocked() == false) {
+            this->collection.erase(it);
+            cout << title << " è stata rimossa da " << this -> collectionName << endl;
+            notify();
+        }else {
+            cout << title << " è bloccata e non può essere rimossa" << endl;
+        }
     }else {
-        cout << title <<" is locked or not found!" << endl;
+        cout << title <<" non è stata trovata!" << endl;
     }
 }
 
@@ -48,7 +52,7 @@ void NoteCollection::printNote(string title) const {
     if (it != this->collection.end()) {
         cout << "Title: " << it->get()->getTitle() << endl;
         cout << "Content: " << it->get()->getContent() << endl;
-        cout << "Locked: " << it->get()->getLocked() << endl;
+        cout << "Locked: " << it->get()->getLocked() << endl << endl;
     }
 }
 
