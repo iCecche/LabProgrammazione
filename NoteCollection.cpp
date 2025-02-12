@@ -24,10 +24,10 @@ void NoteCollection::removeNote(const string &title) {
     if (it != this->collection.end()) {
         if (it -> get() -> getLocked() == false) {
             this->collection.erase(it);
-            cout << "La nota " << title << " è stata rimossa dalla collezione " << this->collectionName << endl;
+            cout << title << " è stata rimossa da " << this -> collectionName << endl;
             notify();
-        } else {
-            cout << "La nota " << title << " è bloccata e non può essere cancellata " << endl;
+        }else {
+            cout << title << " è bloccata e non può essere rimossa" << endl;
         }
     }else {
         cout << "La nota " << title <<" non è stata trovata!" << endl;
@@ -79,10 +79,6 @@ void NoteCollection::printNote(string title) const {
 
 unsigned long NoteCollection::getNumberOfNotes() const {
     return this->collection.size();
-}
-
-string NoteCollection::getCollectionName() const {
-    return this->collectionName;
 }
 
 void NoteCollection::attach(Observer *observer) {

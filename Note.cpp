@@ -12,7 +12,9 @@ Note::Note(const string& title, const string& content, const bool locked) {
 }
 
 void Note::setTitle(const string &title) {
-    this->title = title;
+    if (this -> locked == false) {
+        this->title = title;
+    }
 }
 
 string Note::getTitle() const {
@@ -20,7 +22,9 @@ string Note::getTitle() const {
 }
 
 void Note::setContent(const string &content) {
-    this->content = content;
+    if (this -> locked == false) {
+        this->content = content;
+    }
 }
 
 string Note::getContent() const{

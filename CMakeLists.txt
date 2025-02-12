@@ -3,6 +3,7 @@ project(Notes)
 
 set(CMAKE_CXX_STANDARD 20)
 
+add_subdirectory(tests)
 add_executable(Notes main.cpp
         Note.cpp
         Note.h
@@ -13,4 +14,5 @@ add_executable(Notes main.cpp
         Observer.cpp
         Observer.h
         Observable.cpp
-        Observable.h)
+        Observable.h
+        )
