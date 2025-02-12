@@ -4,6 +4,7 @@
 
 #include "NoteCollection.h"
 #include <iostream>
+#include <optional>
 using namespace std;
 
 NoteCollection::NoteCollection(const string &collectionName) {
@@ -32,6 +33,26 @@ void NoteCollection::removeNote(const string &title) {
         cout << "La nota " << title <<" non è stata trovata!" << endl;
     }
 }
+
+void NoteCollection::editNote(const string &title, const optional<string>& newTitle = nullopt, const optional<string>& newContent = nullopt) {
+    const auto it = find_if(this->collection.begin(), this->collection.end(), [&title](const auto note) {
+        return note->getTitle() == title;
+    });
+
+    if (it != this->collection.end()) {
+        if (it -> get() -> getLocked() == false) {
+            if (newTitle) {
+                it -> get() -> setTitle(*newTitle);
+            }
+            if (newContent) {
+                it -> get() -> setContent(*newContent);
+            }
+        }else {
+            cout << title << " è bloccata e non può essere modificata" << endl;
+        }
+    }
+}
+
 
 const Note* NoteCollection::getNote(const string &title) const {
     const auto it = find_if(this->collection.begin(), this->collection.end(), [&title](const auto note) {

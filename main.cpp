@@ -34,6 +34,7 @@ int main() {
     note1 -> setLocked(true);
     note3 -> setLocked(true);
 
+    cout << "PRINT ALL NOTES" << endl << endl;
     // print collections notes
     cout << collection1 -> getCollectionName() << endl;
     collection1 -> printNote(note1 -> getTitle());
@@ -46,6 +47,17 @@ int main() {
     collection3 -> printNote(note1 -> getTitle());
     collection3 -> printNote(note3 -> getTitle());
 
+    cout << "EDIT NOTES" << endl << endl;
+
+    collection2 -> editNote(note2 -> getTitle(), "New Title", "NewContent");
+    collection3 -> editNote(note3 -> getTitle(), "New Title", "NewContent");
+
+    cout << collection2 -> getCollectionName() << endl;
+    collection2 -> printNote(note2 -> getTitle());
+    cout << collection3 -> getCollectionName() << endl;
+    collection3 -> printNote(note3 -> getTitle());
+
+    cout << "DELETE NOTES" << endl << endl;
     // delete notes
     collection1 -> removeNote(note1 -> getTitle());
     collection2 -> removeNote(note1 -> getTitle());
