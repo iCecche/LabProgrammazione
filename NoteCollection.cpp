@@ -5,80 +5,134 @@
 #include "NoteCollection.h"
 #include <iostream>
 #include <optional>
+#include <cstdlib>
 using namespace std;
 
 NoteCollection::NoteCollection(const string &collectionName) {
     this->collectionName = collectionName;
+    this->preferredCollectionName = std::getenv("PreferredCollection");
 }
 
-void NoteCollection::addNote(const shared_ptr<Note>& newNote) {
-    this->collection.push_back(newNote);
+void NoteCollection::addNote(const shared_ptr<Note>& newNote, const shared_ptr<NoteCollection>& collection) {
+    newNote -> setOwner(collection); // setto me stesso come owner
+    this -> collection.push_back(newNote);
     notify();
 }
 
-void NoteCollection::removeNote(const string &title) {
-    const auto it = find_if(this->collection.begin(), this->collection.end(), [&title](const auto note) {
-        return note->getTitle() == title;
-    });
+void NoteCollection::removeNote(const int &index, const shared_ptr<NoteCollection>& origin_collection) {
 
-    if (it != this->collection.end()) {
-        if (it -> get() -> getLocked() == false) {
-            this->collection.erase(it);
-            cout << title << " è stata rimossa da " << this -> collectionName << endl;
+    if (index >= 0 && index < this->collection.size()) {
+
+        auto note = this->collection.at(index);
+        if (note -> getLocked() == false) {
+            note -> removeOwner(origin_collection);
+            this->collection.erase(this->collection.begin() + index);
+            cout << note->getTitle() << " è stata rimossa da " << this -> collectionName << endl;
             notify();
         }else {
-            cout << title << " è bloccata e non può essere rimossa" << endl;
+            cout << note->getTitle() << " è bloccata e non può essere rimossa" << endl;
         }
     }else {
-        cout << "La nota " << title <<" non è stata trovata!" << endl;
+        cout << "La nota non è stata trovata!" << endl;
     }
 }
 
-void NoteCollection::editNote(const string &title, const optional<string>& newTitle, const optional<string>& newContent) {
-    const auto it = find_if(this->collection.begin(), this->collection.end(), [&title](const auto note) {
-        return note->getTitle() == title;
-    });
-
-    if (it != this->collection.end()) {
-        if (it -> get() -> getLocked() == false) {
-            if (newTitle != nullopt) {
-                it -> get() -> setTitle(*newTitle);
-            }
-            if (newContent != nullopt) {
-                it -> get() -> setContent(*newContent);
+void NoteCollection::moveNote(const int& index,  const shared_ptr<NoteCollection>& origin, const shared_ptr<NoteCollection>& destination) {
+    if (index >= 0 && index < this->collection.size()) {
+        auto note = this->collection.at(index);
+        if (note -> getLocked() == false) {
+            bool is_duplicated = destination -> duplicated(note);
+            if (destination -> isValidOwner(note) && !is_duplicated) {
+                destination -> addNote(note, destination);
+            }else {
+                if (!is_duplicated && this -> collectionName != preferredCollectionName) {
+                    this -> removeNote(index, origin);
+                    destination -> addNote(note, destination);
+                }else {
+                    cout << "La nota è già presente nella collezione!" << endl;
+                }
             }
         }else {
-            cout << title << " è bloccata e non può essere modificata" << endl;
+            cout << "La nota " << note -> getTitle() << " è bloccata e non può essere mossa!" << endl;
         }
+    }else {
+        cout << "La nota non è stata trovata!" << endl;
+    }
+}
+
+void NoteCollection::editNote(const int &index, const optional<string>& newTitle, const optional<string>& newContent) const {
+
+    if (index >= 0 && index < this->collection.size()) {
+        auto note = this->collection.at(index);
+        if (note -> getLocked() == false) {
+            if (newTitle != nullopt) {
+                note -> setTitle(*newTitle);
+            }
+            if (newContent != nullopt) {
+                note -> setContent(*newContent);
+            }
+        }else {
+            cout << note -> getContent() << " è bloccata e non può essere modificata" << endl;
+        }
+    }else {
+        cout << "La nota non è stata trovata!" << endl;
     }
 }
 
 
-const Note* NoteCollection::getNote(const string &title) const {
-    const auto it = find_if(this->collection.begin(), this->collection.end(), [&title](const auto note) {
-        return note->getTitle() == title;
-    });
+shared_ptr<Note> NoteCollection::getNote(const int& index) const {
 
-    if (it != this->collection.end()) {
-        return &(**it);
+    if (index >= 0 && index < this->collection.size()) {
+        return this->collection.at(index);
     }
     return nullptr;
 }
 
-void NoteCollection::printNote(string title) const {
-    const auto it = find_if(this->collection.begin(), this->collection.end(), [&title](const auto note) {
-        return note->getTitle() == title;
-    });
+void NoteCollection::printNote(const int& index) const {
 
-    if (it != this->collection.end()) {
-        cout << "Title: " << it->get()->getTitle() << endl;
-        cout << "Content: " << it->get()->getContent() << endl;
-        cout << "Locked: " << it->get()->getLocked() << endl << endl;
+    if (index >= 0 && index < this->collection.size()) {
+        const auto note = this->collection.at(index);
+        cout << "Title: " << note->getTitle() << endl;
+        cout << "Content: " << note->getContent() << endl;
+        cout << "Locked: " << note->getLocked() << endl << endl;
+    }
+}
+
+void NoteCollection::printAllNotes() const {
+    for (int i = 0; i < this->collection.size(); i++) {
+        const auto note = this->collection.at(i);
+        cout << "Note " << i << ": " << note->getTitle() << endl;
     }
 }
 
 unsigned long NoteCollection::getNumberOfNotes() const {
     return this->collection.size();
+}
+
+string NoteCollection::getCollectionName() const {
+    return this->collectionName;
+}
+
+bool NoteCollection::isValidOwner(const shared_ptr<Note> &note) const {
+    const auto currentOwners = note -> getOwner();
+    if (currentOwners.size() > 1) {
+        for (const auto& currentOwner : currentOwners) {
+            if (currentOwner.lock() -> getCollectionName() == preferredCollectionName) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+bool NoteCollection::duplicated(const shared_ptr<Note>& newNote) const {
+    const auto currentOwners = newNote -> getOwner();
+    for (const auto& currentOwner : currentOwners) {
+        if (currentOwner.lock() -> getCollectionName() == this -> collectionName) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void NoteCollection::attach(Observer *observer) {
@@ -96,5 +150,3 @@ void NoteCollection::notify() {
         observer->update(this->collectionName, this->getNumberOfNotes());
     }
 }
-
-

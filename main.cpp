@@ -2,84 +2,181 @@
 #include "CollectionGroup.h"
 #include "NoteCollection.h"
 #include "Note.h"
+#include <string>
 using namespace std;
 
 shared_ptr<Note> createNote();
-unique_ptr<NoteCollection> createNoteCollection();
+shared_ptr<NoteCollection> createNoteCollection();
+int int_prompt(const string& message);
+string string_prompt(const string& message);
+void PrintCollections(const vector<shared_ptr<NoteCollection>> &collections);
 
 int main() {
-
+    vector<shared_ptr<NoteCollection>> collections;
     const auto observer = new CollectionGroup();
-    const auto collection1 = make_unique<NoteCollection>("Importanti");
-    const auto collection2 = createNoteCollection();
-    const auto collection3 = createNoteCollection();
 
-    // add collections to observer pattern
-    collection1 -> attach(observer);
-    collection2 -> attach(observer);
-    collection3 -> attach(observer);
+    string collection_name = std::getenv("PreferredCollection");
+    auto important_collection = make_shared<NoteCollection>(collection_name);
+    important_collection->attach(observer);
+    collections.push_back(important_collection);
 
-    const auto note1 = createNote();
-    collection1 -> addNote(note1);
-    collection2 -> addNote(note1);
-    collection3 -> addNote(note1);
+    bool running = true;
+    while (running) {
+        cout << "\n---- MENU ----\n";
+        cout << "1. Create Collection\n";
+        cout << "2. Create Note\n";
+        cout << "3. Print Collections\n";
+        cout << "4. Print Note\n";
+        cout << "5. Edit Note\n";
+        cout << "6. Remove Note from Collection\n";
+        cout << "7. Lock/Unlock Note\n";
+        cout << "8. Move Note\n";
+        cout << "0. Exit\n";
+        cout << "Select an option: ";
 
-    const auto note2 = createNote();
-    collection2 -> addNote(note2);
+        int choice;
+        cin >> choice;
+        cin.ignore(); // pulire il buffer
 
-    const auto note3 = createNote();
-    collection3 -> addNote(note3);
+        switch (choice) {
+            case 1: {
+                auto collection = createNoteCollection();
+                collection->attach(observer);
+                collections.push_back(collection);
+                break;
+            }
+            case 2: {
+                auto note = createNote();
+                if (collections.size() == 1) {
+                    const auto& collection = collections.at(0);
+                    collection -> addNote(note, collection);
+                }else {
+                    PrintCollections(collections);
+                    int collection_index = int_prompt("Select Collection index: ");
 
-    // block notes
-    note1 -> setLocked(true);
-    note3 -> setLocked(true);
+                    if (collection_index >= 0 && collection_index < collections.size()) {
+                        const auto& collection = collections[collection_index];
+                        collection -> addNote(note, collection);
+                    }else {
+                        cout << "Collection index out of range.\n";
+                    }
+                }
+                break;
+            }
+            case 3: {
+                PrintCollections(collections);
+                break;
+            }
+            case 4: {
+                PrintCollections(collections);
+                int collection_index = int_prompt("Select Collection index: ");
+                if (collection_index >= 0 && collection_index < collections.size()) {
+                    const auto& collection = collections[collection_index];
+                    collection -> printAllNotes();
+                    int node_index = int_prompt("Select Node index: ");
+                    collection -> printNote(node_index);
+                }
+                break;
+            }
+            case 5: {
+                PrintCollections(collections);
+                const int collection_index = int_prompt("Select Collection Index: ");
+                if (collection_index >= 0 && collection_index < collections.size()) {
+                    const auto& collection = collections[collection_index];
+                    collection -> printAllNotes();
 
-    cout << "PRINT ALL NOTES" << endl << endl;
-    // print collections notes
-    cout << collection1 -> getCollectionName() << endl;
-    collection1 -> printNote(note1 -> getTitle());
+                    int note_index = int_prompt("Note index: ");
+                    string newTitle = string_prompt("New Title: ");
+                    string newContent = string_prompt("New Content: ");
 
-    cout << collection2 -> getCollectionName() << endl;
-    collection2 -> printNote(note1 -> getTitle());
-    collection2 -> printNote(note2 -> getTitle());
+                    collection -> editNote(note_index, newTitle, newContent);
 
-    cout << collection3 -> getCollectionName() << endl;
-    collection3 -> printNote(note1 -> getTitle());
-    collection3 -> printNote(note3 -> getTitle());
+                }else {
+                    cout << "Invalid Collection Index.\n";
+                }
+                break;
+            }
+            case 6: {
+                PrintCollections(collections);
+                const int collection_index = int_prompt("Collection Index: ");
+                if (collection_index >= 0 && collection_index < collections.size()) {
+                    const auto& collection = collections[collection_index];
+                    collection -> printAllNotes();
+                    int note_index = int_prompt("Note index to Remove: ");
 
-    cout << "EDIT NOTES" << endl << endl;
+                    collection -> removeNote(note_index, collection);
+                }
+                break;
+            }
+            case 7: {
+                PrintCollections(collections);
+                int collection_index = int_prompt("Collection Index: ");
+                if (collection_index >= 0 && collection_index < collections.size()) {
+                    const auto& collection = collections[collection_index];
+                    collection -> printAllNotes();
+                    int note_index = int_prompt("Note Index to Lock/Unlock: ");
 
-    collection2 -> editNote(note2 -> getTitle(), "New Title", "NewContent");
-    collection3 -> editNote(note3 -> getTitle(), "New Title", "NewContent");
-
-    cout << collection2 -> getCollectionName() << endl;
-    collection2 -> printNote(note2 -> getTitle());
-    cout << collection3 -> getCollectionName() << endl;
-    collection3 -> printNote(note3 -> getTitle());
-
-    cout << "DELETE NOTES" << endl << endl;
-    // delete notes
-    collection1 -> removeNote(note1 -> getTitle());
-    collection2 -> removeNote(note1 -> getTitle());
-    collection2 -> removeNote(note2 -> getTitle());
-    collection3 -> removeNote(note1 -> getTitle());
-    collection3 -> removeNote(note3 -> getTitle());
-
+                    const auto note = collection -> getNote(note_index);
+                    const bool lockStatus = note -> getLocked();
+                    note -> setLocked(!lockStatus);
+                    cout << (lockStatus ? "Unlocked" : "Locked") << " note " << note -> getTitle() << endl;
+                }
+                break;
+            }
+            case 8: {
+                PrintCollections(collections);
+                const int collection_index = int_prompt("Collection Index: ");
+                if (collection_index >= 0 && collection_index < collections.size()) {
+                    const auto& collection = collections[collection_index];
+                    collection -> printAllNotes();
+                    int note_index = int_prompt("Note index to Move: ");
+                    const int destination_index = int_prompt("Destination Collection Index: ");
+                    const auto& destinationCollection = collections[destination_index];
+                    collection -> moveNote(note_index, collection, destinationCollection);
+                }
+                break;
+            }
+            case 0: {
+                running = false;
+                cout << "Exiting program.\n";
+                break;
+            }
+            default:
+                cout << "Invalid option.\n";
+        }
+    }
     return 0;
 }
 
+int int_prompt(const string& message) {
+    int value = 0;
+    cout << message;
+    cin >> value;
+    cin.ignore();
+    return value;
+}
+
+string string_prompt(const string& message) {
+    string value;
+    cout << message;
+    getline(cin, value);
+    return value;
+}
+
+
+void PrintCollections(const vector<shared_ptr<NoteCollection>> &collections) {
+    for (int i = 0; i < collections.size(); ++i) {
+        cout << "Collection " << i << ": " << collections[i]->getCollectionName() << endl;
+    }
+}
+
 shared_ptr<Note> createNote() {
-    string title, content;
-    cout << "Insert note title: " << endl;
-    getline(cin, title);
-    cout << "Insert note content: " << endl;
-    getline(cin, content);
+    string title = string_prompt("Insert note title: ");
+    string content = string_prompt("Insert note content: ");
     return make_shared<Note>(title, content, false);
 }
 
-unique_ptr<NoteCollection> createNoteCollection() {
-    string collectionTitle;
-    cout << "Insert collection name: " << endl;
-    getline(cin, collectionTitle);
-    return make_unique<NoteCollection>(collectionTitle);
+shared_ptr<NoteCollection> createNoteCollection() {
+    string collectionTitle = string_prompt("Insert collection name: ");
+    return make_shared<NoteCollection>(collectionTitle);
 }

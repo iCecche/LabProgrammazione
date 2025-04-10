@@ -21,63 +21,63 @@ TEST(Note, test2) {
 }
 
 TEST(NoteCollection, test1) {
-    const auto noteCollection = new NoteCollection("NoteCollection1");
+    auto noteCollection = make_shared<NoteCollection>("NoteCollection1");
 
     EXPECT_EQ(noteCollection -> getNumberOfNotes(), 0);
-    EXPECT_EQ(noteCollection -> getNote("a title"), nullptr);
+    EXPECT_EQ(noteCollection -> getNote(0), nullptr);
 
-    noteCollection -> removeNote("Note1");
+    noteCollection -> removeNote(0, noteCollection);
     EXPECT_EQ(noteCollection -> getNumberOfNotes(), 0);
 }
 
 TEST(NoteCollection, test2) {
-    const auto noteCollection = new NoteCollection("NoteCollection1");
+    const auto noteCollection = make_shared<NoteCollection>("NoteCollection1");
     const auto note = make_shared<Note>("Note1", "Content1");
-    noteCollection->addNote(note);
+    noteCollection->addNote(note, noteCollection);
 
     EXPECT_EQ(noteCollection -> getNumberOfNotes(), 1);
-    EXPECT_NE(noteCollection -> getNote("Note1"), nullptr);
-    EXPECT_EQ(noteCollection -> getNote("Note1") -> getTitle(), note -> getTitle());
+    EXPECT_NE(noteCollection -> getNote(0), nullptr);
+    EXPECT_EQ(noteCollection -> getNote(0) -> getTitle(), note -> getTitle());
 }
 
 TEST(NoteCollection, test3) {
-    const auto noteCollection = new NoteCollection("NoteCollection1");
+    const auto noteCollection = make_shared<NoteCollection>("NoteCollection1");
     const auto note = make_shared<Note>("Note1", "Content1");
-    noteCollection->addNote(note);
-    noteCollection -> removeNote("Note1");
+    noteCollection->addNote(note, noteCollection);
+    noteCollection -> removeNote(0, noteCollection);
 
     EXPECT_EQ(noteCollection -> getNumberOfNotes(), 0);
-    EXPECT_EQ(noteCollection -> getNote("Note1"), nullptr);
+    EXPECT_EQ(noteCollection -> getNote(0), nullptr);
 }
 
 TEST(NoteCollection, test4) {
-    const auto noteCollection = new NoteCollection("NoteCollection1");
+    const auto noteCollection = make_shared<NoteCollection>("NoteCollection1");
     const auto note1 = make_shared<Note>("Note1", "Content1");
     const auto note2 = make_shared<Note>("Note2", "Content2", true);
 
-    noteCollection->addNote(note1);
-    noteCollection->addNote(note2);
+    noteCollection->addNote(note1, noteCollection);
+    noteCollection->addNote(note2, noteCollection);
 
-    noteCollection -> editNote("Note1", "Note3", "Content3");
-    noteCollection -> editNote("Note2", "Note4", "Content4");
+    noteCollection -> editNote(0, "Note3", "Content3");
+    noteCollection -> editNote(1, "Note4", "Content4");
 
     EXPECT_EQ(noteCollection -> getNumberOfNotes(), 2);
-    EXPECT_EQ(noteCollection -> getNote("Note3") -> getTitle(), "Note3");
-    EXPECT_EQ(noteCollection -> getNote("Note3") -> getContent(), "Content3");
+    EXPECT_EQ(noteCollection -> getNote(0) -> getTitle(), "Note3");
+    EXPECT_EQ(noteCollection -> getNote(0) -> getContent(), "Content3");
 
-    EXPECT_NE(noteCollection -> getNote("Note2") -> getTitle(), "Note4");
-    EXPECT_NE(noteCollection -> getNote("Note2") -> getContent(), "Content4");
+    EXPECT_NE(noteCollection -> getNote(1) -> getTitle(), "Note4");
+    EXPECT_NE(noteCollection -> getNote(1) -> getContent(), "Content4");
 
-    noteCollection -> editNote("Note3");
-    EXPECT_EQ(noteCollection -> getNote("Note3") -> getTitle(), "Note3");
-    EXPECT_EQ(noteCollection -> getNote("Note3") -> getContent(), "Content3");
+    note2 -> setLocked(false);
+    noteCollection -> editNote(0, "Note3", "Content3");
+    EXPECT_EQ(noteCollection -> getNote(0) -> getTitle(), "Note3");
+    EXPECT_EQ(noteCollection -> getNote(0) -> getContent(), "Content3");
 
-    noteCollection -> editNote("Note3", std::nullopt, "NewContent");
-    EXPECT_EQ(noteCollection -> getNote("Note3") -> getTitle(), "Note3");
-    EXPECT_EQ(noteCollection -> getNote("Note3") -> getContent(), "NewContent");
+    noteCollection -> editNote(0, std::nullopt, "NewContent");
+    EXPECT_EQ(noteCollection -> getNote(0) -> getTitle(), "Note3");
+    EXPECT_EQ(noteCollection -> getNote(0) -> getContent(), "NewContent");
 
-    noteCollection -> editNote("Note3", "NewTitle");
-    EXPECT_EQ(noteCollection -> getNote("NewTitle") -> getTitle(), "NewTitle");
-    EXPECT_EQ(noteCollection -> getNote("NewTitle") -> getContent(), "NewContent");
-
+    noteCollection -> editNote(0, "NewTitle");
+    EXPECT_EQ(noteCollection -> getNote(0) -> getTitle(), "NewTitle");
+    EXPECT_EQ(noteCollection -> getNote(0) -> getContent(), "NewContent");
 }
