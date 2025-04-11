@@ -27,55 +27,53 @@ void NoteCollection::removeNote(const int &index, const shared_ptr<NoteCollectio
         if (note -> getLocked() == false) {
             note -> removeOwner(origin_collection);
             this->collection.erase(this->collection.begin() + index);
-            cout << note->getTitle() << " è stata rimossa da " << this -> collectionName << endl;
+            //cout << note->getTitle() << " è stata rimossa da " << this -> collectionName << endl;
             notify();
         }else {
-            cout << note->getTitle() << " è bloccata e non può essere rimossa" << endl;
+            throw std::logic_error("La nota è bloccata e non può essere rimossa!");
         }
     }else {
-        cout << "La nota non è stata trovata!" << endl;
+        throw std::out_of_range("La nota non è stata trovata");
     }
 }
 
 void NoteCollection::moveNote(const int& index,  const shared_ptr<NoteCollection>& origin, const shared_ptr<NoteCollection>& destination) {
-    if (index >= 0 && index < this->collection.size()) {
-        auto note = this->collection.at(index);
-        if (note -> getLocked() == false) {
-            bool is_duplicated = destination -> duplicated(note);
-            if (destination -> isValidOwner(note) && !is_duplicated) {
-                destination -> addNote(note, destination);
-            }else {
-                if (!is_duplicated && this -> collectionName != preferredCollectionName) {
-                    this -> removeNote(index, origin);
-                    destination -> addNote(note, destination);
-                }else {
-                    cout << "La nota è già presente nella collezione!" << endl;
-                }
-            }
-        }else {
-            cout << "La nota " << note -> getTitle() << " è bloccata e non può essere mossa!" << endl;
-        }
+    if (index < 0 || index >= this->collection.size()) {
+        throw std::out_of_range("La nota non è stata trovata");
+    }
+    auto note = this->collection.at(index);
+    if (note -> getLocked() == true) {
+        throw std::logic_error("La nota è bloccata e non può essere spostata!");
+    }
+    const bool is_duplicated = destination -> duplicated(note);
+    if (destination -> isValidOwner(note) && !is_duplicated) {
+        destination -> addNote(note, destination);
     }else {
-        cout << "La nota non è stata trovata!" << endl;
+        if (is_duplicated ) {
+            throw std::logic_error("La nota è già presente nella collezione!");
+        }
+        if (this -> collectionName == preferredCollectionName) {
+            throw std::logic_error("Non puoi spostare una nota da questa collezione, ma solo rimuoverla!");
+        }
+        this -> removeNote(index, origin);
+        destination -> addNote(note, destination);
     }
 }
 
 void NoteCollection::editNote(const int &index, const optional<string>& newTitle, const optional<string>& newContent) const {
 
-    if (index >= 0 && index < this->collection.size()) {
-        auto note = this->collection.at(index);
-        if (note -> getLocked() == false) {
-            if (newTitle != nullopt) {
-                note -> setTitle(*newTitle);
-            }
-            if (newContent != nullopt) {
-                note -> setContent(*newContent);
-            }
-        }else {
-            cout << note -> getContent() << " è bloccata e non può essere modificata" << endl;
-        }
-    }else {
-        cout << "La nota non è stata trovata!" << endl;
+    if (index < 0 || index >= this->collection.size()) {
+        throw std::out_of_range("La nota non è stata trovata");
+    }
+    auto note = this->collection.at(index);
+    if (note -> getLocked() == true) {
+        throw std::logic_error("La nota è bloccata e non può essere modificata!");
+    }
+    if (newTitle != nullopt) {
+        note -> setTitle(*newTitle);
+    }
+    if (newContent != nullopt) {
+        note -> setContent(*newContent);
     }
 }
 
@@ -89,16 +87,19 @@ shared_ptr<Note> NoteCollection::getNote(const int& index) const {
 }
 
 void NoteCollection::printNote(const int& index) const {
-
+    cout << endl;
     if (index >= 0 && index < this->collection.size()) {
         const auto note = this->collection.at(index);
         cout << "Title: " << note->getTitle() << endl;
         cout << "Content: " << note->getContent() << endl;
         cout << "Locked: " << note->getLocked() << endl << endl;
+    }else {
+        throw std::out_of_range("La nota non è stata trovata");
     }
 }
 
 void NoteCollection::printAllNotes() const {
+    cout << endl;
     for (int i = 0; i < this->collection.size(); i++) {
         const auto note = this->collection.at(i);
         cout << "Note " << i << ": " << note->getTitle() << endl;
@@ -135,18 +136,18 @@ bool NoteCollection::duplicated(const shared_ptr<Note>& newNote) const {
     return false;
 }
 
-void NoteCollection::attach(Observer *observer) {
+void NoteCollection::attach(shared_ptr<Observer> observer) {
     observers.push_back(observer);
 }
 
-void NoteCollection::detach(Observer *observer) {
+void NoteCollection::detach(shared_ptr<Observer> observer) {
     if (auto it = find(observers.begin(), observers.end(), observer); it != observers.end()) {
         observers.erase(it);
     }
 }
 
 void NoteCollection::notify() {
-    for (const auto observer : observers) {
+    for (const auto& observer : observers) {
         observer->update(this->collectionName, this->getNumberOfNotes());
     }
 }

@@ -13,11 +13,12 @@ void PrintCollections(const vector<shared_ptr<NoteCollection>> &collections);
 
 int main() {
     vector<shared_ptr<NoteCollection>> collections;
-    const auto observer = new CollectionGroup();
+    const auto observer = make_shared<CollectionGroup>();
 
     string collection_name = std::getenv("PreferredCollection");
     auto important_collection = make_shared<NoteCollection>(collection_name);
-    important_collection->attach(observer);
+    important_collection -> attach(observer);
+
     collections.push_back(important_collection);
 
     bool running = true;
@@ -37,112 +38,135 @@ int main() {
         int choice;
         cin >> choice;
         cin.ignore(); // pulire il buffer
+        cout << endl;
 
-        switch (choice) {
-            case 1: {
-                auto collection = createNoteCollection();
-                collection->attach(observer);
-                collections.push_back(collection);
-                break;
-            }
-            case 2: {
-                auto note = createNote();
-                if (collections.size() == 1) {
-                    const auto& collection = collections.at(0);
-                    collection -> addNote(note, collection);
-                }else {
+        try {
+            switch (choice) {
+                case 1: {
+                    auto collection = createNoteCollection();
+                    collection -> attach(observer);
+                    collections.push_back(collection);
+                    break;
+                }
+                case 2: {
+                    auto note = createNote();
+                    if (collections.size() == 1) {
+                        const auto& collection = collections.at(0);
+                        collection -> addNote(note, collection);
+                    }else {
+                        PrintCollections(collections);
+                        const int collection_index = int_prompt("Select Collection index: ");
+
+                        if (collection_index < 0 || collection_index >= collections.size()) {
+                            throw std::out_of_range("Invalid collection index");
+                        }
+
+                        const auto& collection = collections[collection_index];
+                        collection -> addNote(note, collection);
+
+                    }
+                    break;
+                }
+                case 3: {
+                    PrintCollections(collections);
+                    break;
+                }
+                case 4: {
                     PrintCollections(collections);
                     int collection_index = int_prompt("Select Collection index: ");
 
-                    if (collection_index >= 0 && collection_index < collections.size()) {
-                        const auto& collection = collections[collection_index];
-                        collection -> addNote(note, collection);
-                    }else {
-                        cout << "Collection index out of range.\n";
+                    if (collection_index < 0 || collection_index >= collections.size()) {
+                        throw std::out_of_range("Invalid collection index");
                     }
-                }
-                break;
-            }
-            case 3: {
-                PrintCollections(collections);
-                break;
-            }
-            case 4: {
-                PrintCollections(collections);
-                int collection_index = int_prompt("Select Collection index: ");
-                if (collection_index >= 0 && collection_index < collections.size()) {
-                    const auto& collection = collections[collection_index];
-                    collection -> printAllNotes();
-                    int node_index = int_prompt("Select Node index: ");
-                    collection -> printNote(node_index);
-                }
-                break;
-            }
-            case 5: {
-                PrintCollections(collections);
-                const int collection_index = int_prompt("Select Collection Index: ");
-                if (collection_index >= 0 && collection_index < collections.size()) {
+
                     const auto& collection = collections[collection_index];
                     collection -> printAllNotes();
 
-                    int note_index = int_prompt("Note index: ");
-                    string newTitle = string_prompt("New Title: ");
-                    string newContent = string_prompt("New Content: ");
+                    const int note_index = int_prompt("Select note index: ");
+                    collection -> printNote(note_index);
+
+                    break;
+                }
+                case 5: {
+                    PrintCollections(collections);
+                    const int collection_index = int_prompt("Select Collection Index: ");
+
+                    if (collection_index < 0 || collection_index >= collections.size()) {
+                        throw std::out_of_range("Invalid collection index");
+                    }
+
+                    const auto& collection = collections[collection_index];
+                    collection -> printAllNotes();
+
+                    const int note_index = int_prompt("Note index: ");
+                    const string newTitle = string_prompt("New Title: ");
+                    const string newContent = string_prompt("New Content: ");
 
                     collection -> editNote(note_index, newTitle, newContent);
-
-                }else {
-                    cout << "Invalid Collection Index.\n";
+                    break;
                 }
-                break;
-            }
-            case 6: {
-                PrintCollections(collections);
-                const int collection_index = int_prompt("Collection Index: ");
-                if (collection_index >= 0 && collection_index < collections.size()) {
+                case 6: {
+                    PrintCollections(collections);
+                    const int collection_index = int_prompt("Collection Index: ");
+
+                    if (collection_index < 0 || collection_index >= collections.size()) {
+                        throw std::out_of_range("Invalid collection index");
+                    }
+
                     const auto& collection = collections[collection_index];
                     collection -> printAllNotes();
-                    int note_index = int_prompt("Note index to Remove: ");
 
+                    const int note_index = int_prompt("Note index to Remove: ");
                     collection -> removeNote(note_index, collection);
+                    break;
                 }
-                break;
-            }
-            case 7: {
-                PrintCollections(collections);
-                int collection_index = int_prompt("Collection Index: ");
-                if (collection_index >= 0 && collection_index < collections.size()) {
+                case 7: {
+                    PrintCollections(collections);
+                    const int collection_index = int_prompt("Collection Index: ");
+
+                    if (collection_index < 0 || collection_index >= collections.size()) {
+                        throw std::out_of_range("Invalid collection index");
+                    }
+
                     const auto& collection = collections[collection_index];
                     collection -> printAllNotes();
-                    int note_index = int_prompt("Note Index to Lock/Unlock: ");
+                    const int note_index = int_prompt("Note Index to Lock/Unlock: ");
 
                     const auto note = collection -> getNote(note_index);
                     const bool lockStatus = note -> getLocked();
+
                     note -> setLocked(!lockStatus);
                     cout << (lockStatus ? "Unlocked" : "Locked") << " note " << note -> getTitle() << endl;
+                    break;
                 }
-                break;
-            }
-            case 8: {
-                PrintCollections(collections);
-                const int collection_index = int_prompt("Collection Index: ");
-                if (collection_index >= 0 && collection_index < collections.size()) {
+                case 8: {
+                    PrintCollections(collections);
+                    const int collection_index = int_prompt("Collection Index: ");
+
+                    if (collection_index < 0 || collection_index >= collections.size()) {
+                        throw std::out_of_range("Invalid collection index");
+                    }
+
                     const auto& collection = collections[collection_index];
                     collection -> printAllNotes();
-                    int note_index = int_prompt("Note index to Move: ");
+
+                    const int note_index = int_prompt("Note index to Move: ");
                     const int destination_index = int_prompt("Destination Collection Index: ");
                     const auto& destinationCollection = collections[destination_index];
+
                     collection -> moveNote(note_index, collection, destinationCollection);
+                    break;
                 }
-                break;
+                case 0: {
+                    running = false;
+                    cout << "Exiting program.\n";
+                    break;
+                }
+                default:
+                    cout << "Invalid option.\n";
             }
-            case 0: {
-                running = false;
-                cout << "Exiting program.\n";
-                break;
-            }
-            default:
-                cout << "Invalid option.\n";
+        }catch (const exception& e) {
+            cout << "\033[31m" << "Error: " << e.what()  << "\033[0m" << endl;
         }
     }
     return 0;
@@ -165,6 +189,7 @@ string string_prompt(const string& message) {
 
 
 void PrintCollections(const vector<shared_ptr<NoteCollection>> &collections) {
+    cout << endl;
     for (int i = 0; i < collections.size(); ++i) {
         cout << "Collection " << i << ": " << collections[i]->getCollectionName() << endl;
     }

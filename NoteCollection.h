@@ -33,14 +33,14 @@ class NoteCollection final : public Observable {
     bool isValidOwner(const shared_ptr<Note> &note) const;
     bool duplicated(const shared_ptr<Note>& newNote) const;
 
-    void attach(Observer *observer) override;
-    void detach(Observer *observer) override;
+    void attach(shared_ptr<Observer> observer) override;
+    void detach(shared_ptr<Observer> observer) override;
     void notify() override;
 
     private:
     string collectionName;
     vector<shared_ptr<Note>> collection;
-    vector<Observer *> observers;
+    vector<shared_ptr<Observer>> observers;
     string preferredCollectionName;
 };
 

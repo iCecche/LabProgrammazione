@@ -10,8 +10,8 @@
 class Observable {
 public:
     virtual ~Observable();
-    virtual void attach(Observer *observer) = 0;
-    virtual void detach(Observer *observer) = 0;
+    virtual void attach(shared_ptr<Observer> observer) = 0;
+    virtual void detach(shared_ptr<Observer> observer) = 0;
     virtual void notify() = 0;
 };
 
