@@ -130,13 +130,9 @@ int main() {
 
                     const auto& collection = collections[collection_index];
                     collection -> printAllNotes();
+
                     const int note_index = int_prompt("Note Index to Lock/Unlock: ");
-
-                    const auto note = collection -> getNote(note_index);
-                    const bool lockStatus = note -> getLocked();
-
-                    note -> setLocked(!lockStatus);
-                    cout << (lockStatus ? "Unlocked" : "Locked") << " note " << note -> getTitle() << endl;
+                    collection -> lockNote(note_index);
                     break;
                 }
                 case 8: {

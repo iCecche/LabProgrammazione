@@ -77,6 +77,17 @@ void NoteCollection::editNote(const int &index, const optional<string>& newTitle
     }
 }
 
+void NoteCollection::lockNote(const int &index) const {
+    if (index < 0 || index >= this->collection.size()) {
+        throw std::out_of_range("La nota non è stata trovata");
+    }
+
+    const auto note = this->collection.at(index);
+    const bool isLocked = note->getLocked();
+    note -> setLocked(!isLocked);
+    cout << (isLocked ? "Unlocked" : "Locked") << " note " << note -> getTitle() << endl;
+}
+
 
 shared_ptr<Note> NoteCollection::getNote(const int& index) const {
 

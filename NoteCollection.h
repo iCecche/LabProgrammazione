@@ -27,7 +27,8 @@ class NoteCollection final : public Observable {
     void printAllNotes() const;
 
     void editNote(const int &index, const optional<string> &newTitle = nullopt, const optional<string> &newContent = nullopt) const;
-    unsigned long getNumberOfNotes() const;
+    void lockNote(const int &index) const;
+    int getNumberOfNotes() const;
     string getCollectionName() const;
 
     bool isValidOwner(const shared_ptr<Note> &note) const;

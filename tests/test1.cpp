@@ -73,3 +73,27 @@ TEST(NoteCollection, Edit_Note_Successfully) {
     EXPECT_EQ(noteCollection -> getNote(0) -> getTitle(), "Note3");
     EXPECT_EQ(noteCollection -> getNote(0) -> getContent(), "Content3");
 }
+
+TEST(NoteCollection, Toggle_Lock_Successfully) {
+    const auto noteCollection = make_shared<NoteCollection>("NoteCollection1");
+    const auto note1 = make_shared<Note>("Note1", "Content1", false);
+
+    noteCollection -> addNote(note1, noteCollection);
+
+    noteCollection -> lockNote(0);
+    EXPECT_EQ(noteCollection -> getNote(0) -> getLocked(), true);
+    EXPECT_EQ(note1 -> getLocked(), true);
+
+    noteCollection -> lockNote(0);
+    EXPECT_EQ(noteCollection -> getNote(0) -> getLocked(), false);
+    EXPECT_EQ(note1 -> getLocked(), false);
+}
+
+TEST(NoteCollection, Toggle_Lock_Unsuccessfully) {
+    const auto noteCollection = make_shared<NoteCollection>("NoteCollection1");
+    const auto note1 = make_shared<Note>("Note1", "Content1", false);
+
+    noteCollection -> addNote(note1, noteCollection);
+
+    EXPECT_THROW(noteCollection -> lockNote(-1), std::out_of_range);
+}
