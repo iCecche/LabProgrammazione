@@ -12,7 +12,7 @@
 #include "Observable.h"
 using namespace std;
 
-class Note; // 👈 Forward declaration perché Note usa weak_ptr<NoteCollection>
+class Note; // Forward declaration perché Note usa weak_ptr<NoteCollection>
 
 class NoteCollection final : public Observable {
     public:
@@ -28,7 +28,8 @@ class NoteCollection final : public Observable {
 
     void editNote(const int &index, const optional<string> &newTitle = nullopt, const optional<string> &newContent = nullopt) const;
     void lockNote(const int &index) const;
-    int getNumberOfNotes() const;
+
+    unsigned long getNumberOfNotes() const;
     string getCollectionName() const;
 
     bool isValidOwner(const shared_ptr<Note> &note) const;

@@ -68,11 +68,11 @@ int main() {
                     break;
                 }
                 case 3: {
-                    PrintCollections(collections);
+                    PrintCollections(collections); // visualizza nome collezioni con indice associato
                     break;
                 }
                 case 4: {
-                    PrintCollections(collections);
+                    PrintCollections(collections); // visualizza nome collezioni con indice associato
                     int collection_index = int_prompt("Select Collection index: ");
 
                     if (collection_index < 0 || collection_index >= collections.size()) {
@@ -80,7 +80,7 @@ int main() {
                     }
 
                     const auto& collection = collections[collection_index];
-                    collection -> printAllNotes();
+                    collection -> printAllNotes(); // visualizza titolo delle note con indice associato
 
                     const int note_index = int_prompt("Select note index: ");
                     collection -> printNote(note_index);
@@ -88,7 +88,7 @@ int main() {
                     break;
                 }
                 case 5: {
-                    PrintCollections(collections);
+                    PrintCollections(collections); // visualizza nome collezioni con indice associato
                     const int collection_index = int_prompt("Select Collection Index: ");
 
                     if (collection_index < 0 || collection_index >= collections.size()) {
@@ -96,7 +96,7 @@ int main() {
                     }
 
                     const auto& collection = collections[collection_index];
-                    collection -> printAllNotes();
+                    collection -> printAllNotes(); // visualizza titolo delle note con indice associato
 
                     const int note_index = int_prompt("Note index: ");
                     const string newTitle = string_prompt("New Title: ");
@@ -106,7 +106,7 @@ int main() {
                     break;
                 }
                 case 6: {
-                    PrintCollections(collections);
+                    PrintCollections(collections); // visualizza nome collezioni con indice associato
                     const int collection_index = int_prompt("Collection Index: ");
 
                     if (collection_index < 0 || collection_index >= collections.size()) {
@@ -114,14 +114,14 @@ int main() {
                     }
 
                     const auto& collection = collections[collection_index];
-                    collection -> printAllNotes();
+                    collection -> printAllNotes(); // visualizza titolo delle note con indice associato
 
                     const int note_index = int_prompt("Note index to Remove: ");
                     collection -> removeNote(note_index, collection);
                     break;
                 }
                 case 7: {
-                    PrintCollections(collections);
+                    PrintCollections(collections); // visualizza nome collezioni con indice associato
                     const int collection_index = int_prompt("Collection Index: ");
 
                     if (collection_index < 0 || collection_index >= collections.size()) {
@@ -129,14 +129,14 @@ int main() {
                     }
 
                     const auto& collection = collections[collection_index];
-                    collection -> printAllNotes();
+                    collection -> printAllNotes();  // visualizza titolo delle note con indice associato
 
                     const int note_index = int_prompt("Note Index to Lock/Unlock: ");
                     collection -> lockNote(note_index);
                     break;
                 }
                 case 8: {
-                    PrintCollections(collections);
+                    PrintCollections(collections); // visualizza nome collezioni con indice associato
                     const int collection_index = int_prompt("Collection Index: ");
 
                     if (collection_index < 0 || collection_index >= collections.size()) {
@@ -144,7 +144,8 @@ int main() {
                     }
 
                     const auto& collection = collections[collection_index];
-                    collection -> printAllNotes();
+
+                    collection -> printAllNotes(); // visualizza titolo delle note con indice associato
 
                     const int note_index = int_prompt("Note index to Move: ");
                     const int destination_index = int_prompt("Destination Collection Index: ");
@@ -187,7 +188,7 @@ string string_prompt(const string& message) {
 void PrintCollections(const vector<shared_ptr<NoteCollection>> &collections) {
     cout << endl;
     for (int i = 0; i < collections.size(); ++i) {
-        cout << "Collection " << i << ": " << collections[i]->getCollectionName() << endl;
+        cout << i << ") " << collections[i]->getCollectionName() << endl;
     }
 }
 

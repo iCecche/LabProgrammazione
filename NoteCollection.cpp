@@ -14,9 +14,9 @@ NoteCollection::NoteCollection(const string &collectionName) {
 }
 
 void NoteCollection::addNote(const shared_ptr<Note>& newNote, const shared_ptr<NoteCollection>& collection) {
-    newNote -> setOwner(collection); // setto me stesso come owner
+    newNote -> setOwner(collection); // setto la collezione stessa come owner
     this -> collection.push_back(newNote);
-    notify();
+    notify(); // notifica observer del cambiamento
 }
 
 void NoteCollection::removeNote(const int &index, const shared_ptr<NoteCollection>& origin_collection) {
@@ -27,7 +27,6 @@ void NoteCollection::removeNote(const int &index, const shared_ptr<NoteCollectio
         if (note -> getLocked() == false) {
             note -> removeOwner(origin_collection);
             this->collection.erase(this->collection.begin() + index);
-            //cout << note->getTitle() << " è stata rimossa da " << this -> collectionName << endl;
             notify();
         }else {
             throw std::logic_error("La nota è bloccata e non può essere rimossa!");
@@ -46,17 +45,17 @@ void NoteCollection::moveNote(const int& index,  const shared_ptr<NoteCollection
         throw std::logic_error("La nota è bloccata e non può essere spostata!");
     }
     const bool is_duplicated = destination -> duplicated(note);
-    if (destination -> isValidOwner(note) && !is_duplicated) {
+    if (destination -> isValidOwner(note) && !is_duplicated) {  // se la collezione di destinazione è valida e la nota non è già al suo interno
         destination -> addNote(note, destination);
     }else {
         if (is_duplicated ) {
             throw std::logic_error("La nota è già presente nella collezione!");
         }
-        if (this -> collectionName == preferredCollectionName) {
+        if (this -> collectionName == preferredCollectionName) {  // se la collezione di origine è la Important lancia errore.
             throw std::logic_error("Non puoi spostare una nota da questa collezione, ma solo rimuoverla!");
         }
-        this -> removeNote(index, origin);
-        destination -> addNote(note, destination);
+        this -> removeNote(index, origin);  // rimuovi da collezione a cui appartiene
+        destination -> addNote(note, destination);  // assegna alla collezione di destinazione
     }
 }
 
@@ -130,7 +129,7 @@ bool NoteCollection::isValidOwner(const shared_ptr<Note> &note) const {
     if (currentOwners.size() > 1) {
         for (const auto& currentOwner : currentOwners) {
             if (currentOwner.lock() -> getCollectionName() == preferredCollectionName) {
-                return false;
+                return false;   // se ha più di una ower collection e una di queste è la collection Important
             }
         }
     }
@@ -141,7 +140,7 @@ bool NoteCollection::duplicated(const shared_ptr<Note>& newNote) const {
     const auto currentOwners = newNote -> getOwner();
     for (const auto& currentOwner : currentOwners) {
         if (currentOwner.lock() -> getCollectionName() == this -> collectionName) {
-            return true;
+            return true;    // se la nota è già presente nella collezione, ovvero se all'interno del vettore che tiene traccia dei possessori è già presente la collezione
         }
     }
     return false;

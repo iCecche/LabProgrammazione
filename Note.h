@@ -9,7 +9,7 @@
 #include "NoteCollection.h"
 using namespace std;
 
-class NoteCollection; // 👈 Forward declaration perché Note usa weak_ptr<NoteCollection>
+class NoteCollection; // Forward declaration perché Note usa weak_ptr<NoteCollection>
 
 class Note {
 public:
