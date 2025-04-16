@@ -1,5 +1,5 @@
-#include "../Note.h"
-#include "../NoteCollection.h"
+#include "../src/Note.h"
+#include "../src/NoteCollection.h"
 #include "gtest/gtest.h"
 
 TEST(Note, Create_Note_Successfully) {
