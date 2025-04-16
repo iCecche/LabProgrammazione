@@ -54,7 +54,7 @@ TEST(NoteCollection, Edit_Note_Unsuccessfully) {
     const auto note1 = make_shared<Note>("Note1", "Content1", true);
 
     noteCollection->addNote(note1, noteCollection);
-    EXPECT_THROW(noteCollection -> editNote(0, "Note4", "Content4"), std::logic_error);
+    EXPECT_THROW(noteCollection -> editNote(0, "Note4", "Content4"), std::invalid_argument);
 
     EXPECT_EQ(noteCollection -> getNote(0) -> getTitle(), "Note1");
     EXPECT_EQ(noteCollection -> getNote(0) -> getContent(), "Content1");

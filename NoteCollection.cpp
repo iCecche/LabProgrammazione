@@ -29,7 +29,7 @@ void NoteCollection::removeNote(const int &index, const shared_ptr<NoteCollectio
             this->collection.erase(this->collection.begin() + index);
             notify();
         }else {
-            throw std::logic_error("La nota è bloccata e non può essere rimossa!");
+            throw std::invalid_argument("La nota è bloccata e non può essere rimossa!");
         }
     }else {
         throw std::out_of_range("La nota non è stata trovata");
@@ -42,17 +42,17 @@ void NoteCollection::moveNote(const int& index,  const shared_ptr<NoteCollection
     }
     auto note = this->collection.at(index);
     if (note -> getLocked() == true) {
-        throw std::logic_error("La nota è bloccata e non può essere spostata!");
+        throw std::invalid_argument("La nota è bloccata e non può essere spostata!");
     }
     const bool is_duplicated = destination -> duplicated(note);
     if (destination -> isValidOwner(note) && !is_duplicated) {  // se la collezione di destinazione è valida e la nota non è già al suo interno
         destination -> addNote(note, destination);
     }else {
         if (is_duplicated ) {
-            throw std::logic_error("La nota è già presente nella collezione!");
+            throw std::invalid_argument("La nota è già presente nella collezione!");
         }
         if (this -> collectionName == preferredCollectionName) {  // se la collezione di origine è la Important lancia errore.
-            throw std::logic_error("Non puoi spostare una nota da questa collezione, ma solo rimuoverla!");
+            throw std::invalid_argument("Non puoi spostare una nota da questa collezione, ma solo rimuoverla!");
         }
         this -> removeNote(index, origin);  // rimuovi da collezione a cui appartiene
         destination -> addNote(note, destination);  // assegna alla collezione di destinazione
@@ -66,7 +66,7 @@ void NoteCollection::editNote(const int &index, const optional<string>& newTitle
     }
     auto note = this->collection.at(index);
     if (note -> getLocked() == true) {
-        throw std::logic_error("La nota è bloccata e non può essere modificata!");
+        throw std::invalid_argument("La nota è bloccata e non può essere modificata!");
     }
     if (newTitle != nullopt) {
         note -> setTitle(*newTitle);

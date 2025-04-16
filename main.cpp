@@ -5,11 +5,11 @@
 #include <string>
 using namespace std;
 
-shared_ptr<Note> createNote();
-shared_ptr<NoteCollection> createNoteCollection();
+shared_ptr<Note> create_note();
+shared_ptr<NoteCollection> create_note_collection();
 int int_prompt(const string& message);
 string string_prompt(const string& message);
-void PrintCollections(const vector<shared_ptr<NoteCollection>> &collections);
+void print_collections(const vector<shared_ptr<NoteCollection>> &collections);
 
 int main() {
     vector<shared_ptr<NoteCollection>> collections;
@@ -43,18 +43,18 @@ int main() {
         try {
             switch (choice) {
                 case 1: {
-                    auto collection = createNoteCollection();
+                    auto collection = create_note_collection();
                     collection -> attach(observer);
                     collections.push_back(collection);
                     break;
                 }
                 case 2: {
-                    auto note = createNote();
+                    auto note = create_note();
                     if (collections.size() == 1) {
                         const auto& collection = collections.at(0);
                         collection -> addNote(note, collection);
                     }else {
-                        PrintCollections(collections);
+                        print_collections(collections);
                         const int collection_index = int_prompt("Select Collection index: ");
 
                         if (collection_index < 0 || collection_index >= collections.size()) {
@@ -68,11 +68,11 @@ int main() {
                     break;
                 }
                 case 3: {
-                    PrintCollections(collections); // visualizza nome collezioni con indice associato
+                    print_collections(collections); // visualizza nome collezioni con indice associato
                     break;
                 }
                 case 4: {
-                    PrintCollections(collections); // visualizza nome collezioni con indice associato
+                    print_collections(collections); // visualizza nome collezioni con indice associato
                     int collection_index = int_prompt("Select Collection index: ");
 
                     if (collection_index < 0 || collection_index >= collections.size()) {
@@ -88,7 +88,7 @@ int main() {
                     break;
                 }
                 case 5: {
-                    PrintCollections(collections); // visualizza nome collezioni con indice associato
+                    print_collections(collections); // visualizza nome collezioni con indice associato
                     const int collection_index = int_prompt("Select Collection Index: ");
 
                     if (collection_index < 0 || collection_index >= collections.size()) {
@@ -99,14 +99,14 @@ int main() {
                     collection -> printAllNotes(); // visualizza titolo delle note con indice associato
 
                     const int note_index = int_prompt("Note index: ");
-                    const string newTitle = string_prompt("New Title: ");
-                    const string newContent = string_prompt("New Content: ");
+                    const string new_title = string_prompt("New Title: ");
+                    const string new_content = string_prompt("New Content: ");
 
-                    collection -> editNote(note_index, newTitle, newContent);
+                    collection -> editNote(note_index, new_title, new_content);
                     break;
                 }
                 case 6: {
-                    PrintCollections(collections); // visualizza nome collezioni con indice associato
+                    print_collections(collections); // visualizza nome collezioni con indice associato
                     const int collection_index = int_prompt("Collection Index: ");
 
                     if (collection_index < 0 || collection_index >= collections.size()) {
@@ -121,7 +121,7 @@ int main() {
                     break;
                 }
                 case 7: {
-                    PrintCollections(collections); // visualizza nome collezioni con indice associato
+                    print_collections(collections); // visualizza nome collezioni con indice associato
                     const int collection_index = int_prompt("Collection Index: ");
 
                     if (collection_index < 0 || collection_index >= collections.size()) {
@@ -136,7 +136,7 @@ int main() {
                     break;
                 }
                 case 8: {
-                    PrintCollections(collections); // visualizza nome collezioni con indice associato
+                    print_collections(collections); // visualizza nome collezioni con indice associato
                     const int collection_index = int_prompt("Collection Index: ");
 
                     if (collection_index < 0 || collection_index >= collections.size()) {
@@ -149,9 +149,9 @@ int main() {
 
                     const int note_index = int_prompt("Note index to Move: ");
                     const int destination_index = int_prompt("Destination Collection Index: ");
-                    const auto& destinationCollection = collections[destination_index];
+                    const auto& destination_collection = collections[destination_index];
 
-                    collection -> moveNote(note_index, collection, destinationCollection);
+                    collection -> moveNote(note_index, collection, destination_collection);
                     break;
                 }
                 case 0: {
@@ -160,7 +160,7 @@ int main() {
                     break;
                 }
                 default:
-                    cout << "Invalid option.\n";
+                    throw std::invalid_argument("Invalid option");
             }
         }catch (const exception& e) {
             cout << "\033[31m" << "Error: " << e.what()  << "\033[0m" << endl;
@@ -185,20 +185,20 @@ string string_prompt(const string& message) {
 }
 
 
-void PrintCollections(const vector<shared_ptr<NoteCollection>> &collections) {
+void print_collections(const vector<shared_ptr<NoteCollection>> &collections) {
     cout << endl;
     for (int i = 0; i < collections.size(); ++i) {
         cout << i << ") " << collections[i]->getCollectionName() << endl;
     }
 }
 
-shared_ptr<Note> createNote() {
+shared_ptr<Note> create_note() {
     string title = string_prompt("Insert note title: ");
     string content = string_prompt("Insert note content: ");
     return make_shared<Note>(title, content, false);
 }
 
-shared_ptr<NoteCollection> createNoteCollection() {
-    string collectionTitle = string_prompt("Insert collection name: ");
-    return make_shared<NoteCollection>(collectionTitle);
+shared_ptr<NoteCollection> create_note_collection() {
+    string collection_title = string_prompt("Insert collection name: ");
+    return make_shared<NoteCollection>(collection_title);
 }
