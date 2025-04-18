@@ -9,7 +9,7 @@ using namespace std;
 
 class Observer {
 public:
-    virtual ~Observer();
+    virtual ~Observer() = default;
     virtual void update(const string& collectionName, const unsigned long& size) = 0;
 };
 

@@ -38,20 +38,3 @@ void Note::setLocked(const bool& locked) {
 bool Note::getLocked() const {
     return locked;
 }
-
-void Note::setOwner(const shared_ptr<NoteCollection>& collection) {
-    ownerCollection.push_back(collection);
-}
-
-void Note::removeOwner(const shared_ptr<NoteCollection> &collection) {
-    const auto it = std::find_if(ownerCollection.begin(), ownerCollection.end(),[collection](const weak_ptr<NoteCollection>& member) {
-        if (member.lock() == collection) {
-            return true;
-        }
-    });
-    ownerCollection.erase(it);
-}
-
-vector<weak_ptr<NoteCollection>> Note::getOwner() const {
-    return ownerCollection;
-}

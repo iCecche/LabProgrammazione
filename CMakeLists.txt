@@ -11,8 +11,6 @@ add_executable(Notes src/main.cpp
         src/NoteCollection.h
         src/CollectionGroup.cpp
         src/CollectionGroup.h
-        src/Observer.cpp
         src/Observer.h
-        src/Observable.cpp
         src/Observable.h
         )

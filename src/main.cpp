@@ -52,7 +52,7 @@ int main() {
                     auto note = create_note();
                     if (collections.size() == 1) {
                         const auto& collection = collections.at(0);
-                        collection -> addNote(note, collection);
+                        collection -> addNote(note);
                     }else {
                         print_collections(collections);
                         const int collection_index = int_prompt("Select Collection index: ");
@@ -62,7 +62,7 @@ int main() {
                         }
 
                         const auto& collection = collections[collection_index];
-                        collection -> addNote(note, collection);
+                        collection -> addNote(note);
 
                     }
                     break;
@@ -117,7 +117,7 @@ int main() {
                     collection -> printAllNotes(); // visualizza titolo delle note con indice associato
 
                     const int note_index = int_prompt("Note index to Remove: ");
-                    collection -> removeNote(note_index, collection);
+                    collection -> removeNote(note_index);
                     break;
                 }
                 case 7: {

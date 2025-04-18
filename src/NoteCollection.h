@@ -12,14 +12,12 @@
 #include "Observable.h"
 using namespace std;
 
-class Note; // Forward declaration perché Note usa weak_ptr<NoteCollection>
-
 class NoteCollection final : public Observable {
     public:
     explicit NoteCollection(const string& collectionName);
     ~NoteCollection() override = default;
-    void addNote(const shared_ptr<Note> &newNote, const shared_ptr<NoteCollection>& collection);
-    void removeNote(const int &index, const shared_ptr<NoteCollection> &collection);
+    void addNote(const shared_ptr<Note> &newNote);
+    void removeNote(const int &index);
     void moveNote(const int& index,  const shared_ptr<NoteCollection>& origin, const shared_ptr<NoteCollection>& destination);
 
     shared_ptr<Note> getNote(const int &index) const;
@@ -32,14 +30,14 @@ class NoteCollection final : public Observable {
     unsigned long getNumberOfNotes() const;
     string getCollectionName() const;
 
-    bool isValidOwner(const shared_ptr<Note> &note) const;
-    bool duplicated(const shared_ptr<Note>& newNote) const;
+    bool isValidMove(const shared_ptr<NoteCollection> &origin) const;
+    bool isDuplicated(const shared_ptr<Note> &note) const;
 
     void attach(shared_ptr<Observer> observer) override;
     void detach(shared_ptr<Observer> observer) override;
     void notify() override;
 
-    private:
+private:
     string collectionName;
     vector<shared_ptr<Note>> collection;
     vector<shared_ptr<Observer>> observers;

@@ -13,20 +13,18 @@ NoteCollection::NoteCollection(const string &collectionName) {
     this->preferredCollectionName = std::getenv("PreferredCollection");
 }
 
-void NoteCollection::addNote(const shared_ptr<Note>& newNote, const shared_ptr<NoteCollection>& collection) {
-    newNote -> setOwner(collection); // setto la collezione stessa come owner
-    this -> collection.push_back(newNote);
+void NoteCollection::addNote(const shared_ptr<Note>& newNote) {
+    collection.push_back(newNote);
     notify(); // notifica observer del cambiamento
 }
 
-void NoteCollection::removeNote(const int &index, const shared_ptr<NoteCollection>& origin_collection) {
+void NoteCollection::removeNote(const int &index) {
 
-    if (index >= 0 && index < this->collection.size()) {
+    if (index >= 0 && index < collection.size()) {
 
-        auto note = this->collection.at(index);
+        auto note = collection.at(index);
         if (note -> getLocked() == false) {
-            note -> removeOwner(origin_collection);
-            this->collection.erase(this->collection.begin() + index);
+            collection.erase(collection.begin() + index);
             notify();
         }else {
             throw std::invalid_argument("La nota è bloccata e non può essere rimossa!");
@@ -37,34 +35,34 @@ void NoteCollection::removeNote(const int &index, const shared_ptr<NoteCollectio
 }
 
 void NoteCollection::moveNote(const int& index,  const shared_ptr<NoteCollection>& origin, const shared_ptr<NoteCollection>& destination) {
-    if (index < 0 || index >= this->collection.size()) {
+    if (index < 0 || index >= collection.size()) {
         throw std::out_of_range("La nota non è stata trovata");
     }
-    auto note = this->collection.at(index);
+    auto note = collection.at(index);
     if (note -> getLocked() == true) {
         throw std::invalid_argument("La nota è bloccata e non può essere spostata!");
     }
-    const bool is_duplicated = destination -> duplicated(note);
-    if (destination -> isValidOwner(note) && !is_duplicated) {  // se la collezione di destinazione è valida e la nota non è già al suo interno
-        destination -> addNote(note, destination);
+    const bool is_duplicated = destination -> isDuplicated(note);
+    if (destination -> isValidMove(origin) && !is_duplicated) {  // se la collezione di destinazione è valida e la nota non è già al suo interno
+        destination -> addNote(note);
     }else {
         if (is_duplicated ) {
             throw std::invalid_argument("La nota è già presente nella collezione!");
         }
-        if (this -> collectionName == preferredCollectionName) {  // se la collezione di origine è la Important lancia errore.
+        if (collectionName == preferredCollectionName) {  // se la collezione di origine è la Important lancia errore.
             throw std::invalid_argument("Non puoi spostare una nota da questa collezione, ma solo rimuoverla!");
         }
-        this -> removeNote(index, origin);  // rimuovi da collezione a cui appartiene
-        destination -> addNote(note, destination);  // assegna alla collezione di destinazione
+        removeNote(index);  // rimuovi da collezione a cui appartiene
+        destination -> addNote(note);  // assegna alla collezione di destinazione
     }
 }
 
 void NoteCollection::editNote(const int &index, const optional<string>& newTitle, const optional<string>& newContent) const {
 
-    if (index < 0 || index >= this->collection.size()) {
+    if (index < 0 || index >= collection.size()) {
         throw std::out_of_range("La nota non è stata trovata");
     }
-    auto note = this->collection.at(index);
+    auto note = collection.at(index);
     if (note -> getLocked() == true) {
         throw std::invalid_argument("La nota è bloccata e non può essere modificata!");
     }
@@ -77,11 +75,11 @@ void NoteCollection::editNote(const int &index, const optional<string>& newTitle
 }
 
 void NoteCollection::lockNote(const int &index) const {
-    if (index < 0 || index >= this->collection.size()) {
+    if (index < 0 || index >= collection.size()) {
         throw std::out_of_range("La nota non è stata trovata");
     }
 
-    const auto note = this->collection.at(index);
+    const auto note = collection.at(index);
     const bool isLocked = note->getLocked();
     note -> setLocked(!isLocked);
     cout << (isLocked ? "Unlocked" : "Locked") << " note " << note -> getTitle() << endl;
@@ -90,16 +88,16 @@ void NoteCollection::lockNote(const int &index) const {
 
 shared_ptr<Note> NoteCollection::getNote(const int& index) const {
 
-    if (index >= 0 && index < this->collection.size()) {
-        return this->collection.at(index);
+    if (index >= 0 && index < collection.size()) {
+        return collection.at(index);
     }
     return nullptr;
 }
 
 void NoteCollection::printNote(const int& index) const {
     cout << endl;
-    if (index >= 0 && index < this->collection.size()) {
-        const auto note = this->collection.at(index);
+    if (index >= 0 && index < collection.size()) {
+        const auto note = collection.at(index);
         cout << "Title: " << note->getTitle() << endl;
         cout << "Content: " << note->getContent() << endl;
         cout << "Locked: " << note->getLocked() << endl << endl;
@@ -110,40 +108,39 @@ void NoteCollection::printNote(const int& index) const {
 
 void NoteCollection::printAllNotes() const {
     cout << endl;
-    for (int i = 0; i < this->collection.size(); i++) {
-        const auto note = this->collection.at(i);
+    for (int i = 0; i < collection.size(); i++) {
+        const auto note = collection.at(i);
         cout << "Note " << i << ": " << note->getTitle() << endl;
     }
 }
 
 unsigned long NoteCollection::getNumberOfNotes() const {
-    return this->collection.size();
+    return collection.size();
 }
 
 string NoteCollection::getCollectionName() const {
-    return this->collectionName;
+    return collectionName;
 }
 
-bool NoteCollection::isValidOwner(const shared_ptr<Note> &note) const {
-    const auto currentOwners = note -> getOwner();
-    if (currentOwners.size() > 1) {
-        for (const auto& currentOwner : currentOwners) {
-            if (currentOwner.lock() -> getCollectionName() == preferredCollectionName) {
-                return false;   // se ha più di una ower collection e una di queste è la collection Important
-            }
-        }
+bool NoteCollection::isValidMove(const shared_ptr<NoteCollection>& origin) const {
+    // se origine == important -> no valid move: non si può spostare da important -> solo aggiungere/rimuovere/modificare
+    if (origin -> getCollectionName() == preferredCollectionName) {
+        return false;
+    }
+
+    // se origine != destinazione e se destinazione != important -> necessario prima rimuovere da origin e poi aggiungere a destination -> no valid move
+    if (origin -> getCollectionName() != collectionName && collectionName != preferredCollectionName) {
+        return false;
     }
     return true;
 }
 
-bool NoteCollection::duplicated(const shared_ptr<Note>& newNote) const {
-    const auto currentOwners = newNote -> getOwner();
-    for (const auto& currentOwner : currentOwners) {
-        if (currentOwner.lock() -> getCollectionName() == this -> collectionName) {
-            return true;    // se la nota è già presente nella collezione, ovvero se all'interno del vettore che tiene traccia dei possessori è già presente la collezione
-        }
+bool NoteCollection::isDuplicated(const shared_ptr<Note>& note) const {
+    const auto& it = std::find(collection.begin(), collection.end(), note);
+    if (it == collection.end()) {
+        return false;
     }
-    return false;
+    return true;
 }
 
 void NoteCollection::attach(shared_ptr<Observer> observer) {
@@ -151,13 +148,13 @@ void NoteCollection::attach(shared_ptr<Observer> observer) {
 }
 
 void NoteCollection::detach(shared_ptr<Observer> observer) {
-    if (auto it = find(observers.begin(), observers.end(), observer); it != observers.end()) {
+    if (const auto& it = find(observers.begin(), observers.end(), observer); it != observers.end()) {
         observers.erase(it);
     }
 }
 
 void NoteCollection::notify() {
     for (const auto& observer : observers) {
-        observer->update(this->collectionName, this->getNumberOfNotes());
+        observer->update(collectionName, getNumberOfNotes());
     }
 }
