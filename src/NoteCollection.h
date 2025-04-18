@@ -36,7 +36,7 @@ class NoteCollection final : public Observable {
 
     vector<shared_ptr<Note>> searchLocked() const;
     vector<shared_ptr<Note>> searchPinned() const;
-    vector<shared_ptr<Note> > searchNEmpty() const;
+    vector<shared_ptr<Note>> searchNEmpty() const;
 
     void printSearchResult(const vector<shared_ptr<Note>> &searchResult) const;
 
