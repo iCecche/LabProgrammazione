@@ -83,3 +83,101 @@ TEST(NoteCollection, Toggle_Lock_Unsuccessfully) {
 
     EXPECT_THROW(noteCollection -> lockNote(-1), std::out_of_range);
 }
+
+TEST(NoteCollection, TogglePin_Successfully) {
+    const auto noteCollection = make_shared<NoteCollection>("NoteCollection1");
+    const auto note1 = make_shared<Note>("Note1", "Content1", false, false);
+
+    noteCollection -> addNote(note1);
+
+    noteCollection -> pinNote(0);
+    EXPECT_EQ(noteCollection -> getNote(0) -> getPinned(), true);
+
+    noteCollection -> pinNote(0);
+    EXPECT_EQ(noteCollection -> getNote(0) -> getPinned(), false);
+}
+
+TEST(NoteCollection, TogglePin_Unsuccessfully) {
+    const auto noteCollection = make_shared<NoteCollection>("NoteCollection1");
+    const auto note1 = make_shared<Note>("Note1", "Content1", false, false);
+
+    noteCollection -> addNote(note1);
+
+    EXPECT_THROW(noteCollection -> pinNote(-1), std::out_of_range);
+    EXPECT_THROW(noteCollection -> pinNote(1), std::out_of_range);
+}
+
+TEST(NoteCollection, Search_Locked_Note_Successfully) {
+    const auto noteCollection = make_shared<NoteCollection>("NoteCollection1");
+    const auto note1 = make_shared<Note>("Note1", "Content1", false, false);
+    const auto note2 = make_shared<Note>("Note2", "Content2", true, false);
+
+    noteCollection -> addNote(note1);
+    noteCollection -> addNote(note2);
+
+    const auto result = noteCollection -> searchLocked();
+    EXPECT_EQ(result.size(), 1);
+    EXPECT_EQ(result[0], note2);
+}
+
+TEST(NoteCollection, Search_Locked_Note_Unsuccessfully) {
+    const auto noteCollection = make_shared<NoteCollection>("NoteCollection1");
+    const auto note1 = make_shared<Note>("Note1", "Content1", false, false);
+    const auto note2 = make_shared<Note>("Note2", "Content2", false, false);
+
+    noteCollection -> addNote(note1);
+    noteCollection -> addNote(note2);
+
+    const auto result = noteCollection -> searchLocked();
+    EXPECT_EQ(result.size(), 0);
+}
+
+TEST(NoteCollection, Search_Pinned_Note_Successfully) {
+    const auto noteCollection = make_shared<NoteCollection>("NoteCollection1");
+    const auto note1 = make_shared<Note>("Note1", "Content1", false, false);
+    const auto note2 = make_shared<Note>("Note2", "Content2", false, true);
+
+    noteCollection -> addNote(note1);
+    noteCollection -> addNote(note2);
+
+    const auto result = noteCollection -> searchPinned();
+    EXPECT_EQ(result.size(), 1);
+    EXPECT_EQ(result[0], note2);
+}
+
+TEST(NoteCollection, Search_Pinned_Note_Unsuccessfully) {
+    const auto noteCollection = make_shared<NoteCollection>("NoteCollection1");
+    const auto note1 = make_shared<Note>("Note1", "Content1", false, false);
+    const auto note2 = make_shared<Note>("Note2", "Content2", false, false);
+
+    noteCollection -> addNote(note1);
+    noteCollection -> addNote(note2);
+
+    const auto result = noteCollection -> searchPinned();
+    EXPECT_EQ(result.size(), 0);
+}
+
+TEST(NoteCollection, Search_Not_Empty_Note_Successfully) {
+    const auto noteCollection = make_shared<NoteCollection>("NoteCollection1");
+    const auto note1 = make_shared<Note>("Note1", "", false, false);
+    const auto note2 = make_shared<Note>("Note2", "Content2", false, false);
+
+    noteCollection -> addNote(note1);
+    noteCollection -> addNote(note2);
+
+    const auto result = noteCollection -> searchNEmpty();
+    EXPECT_EQ(result.size(), 1);
+    EXPECT_EQ(result[0], note2);
+}
+
+TEST(NoteCollection, Search_Not_Empty_Note_Unsuccessfully) {
+    const auto noteCollection = make_shared<NoteCollection>("NoteCollection1");
+    const auto note1 = make_shared<Note>("Note1", "", false, false);
+    const auto note2 = make_shared<Note>("Note2", "", false, false);
+
+    noteCollection -> addNote(note1);
+    noteCollection -> addNote(note2);
+
+    const auto result = noteCollection -> searchNEmpty();
+    EXPECT_EQ(result.size(), 0);
+}

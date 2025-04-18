@@ -5,10 +5,11 @@
 #include "Note.h"
 using namespace std;
 
-Note::Note(const string& title, const string& content, const bool locked) {
+Note::Note(const string& title, const string& content, const bool locked, const bool pinned) {
     this->title = title;
     this->content = content;
     this->locked = locked;
+    this->pinned = pinned;
 }
 
 void Note::setTitle(const string &title) {
@@ -38,3 +39,12 @@ void Note::setLocked(const bool& locked) {
 bool Note::getLocked() const {
     return locked;
 }
+
+void Note::setPinned(bool value) {
+    this -> pinned = value;
+}
+
+bool Note::getPinned() const {
+    return pinned;
+}
+

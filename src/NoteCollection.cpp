@@ -85,6 +85,16 @@ void NoteCollection::lockNote(const int &index) const {
     cout << (isLocked ? "Unlocked" : "Locked") << " note " << note -> getTitle() << endl;
 }
 
+void NoteCollection::pinNote(const int &index) const {
+    if (index < 0 || index >= collection.size()) {
+        throw std::out_of_range("La nota non è stata trovata");
+    }
+    const auto note = collection.at(index);
+    const bool isPinned = note-> getPinned();
+    note -> setPinned(!isPinned);
+    cout << (isPinned ? "Unpinned" : "Pinned") << " note " << note -> getTitle() << endl;
+}
+
 
 shared_ptr<Note> NoteCollection::getNote(const int& index) const {
 
@@ -100,7 +110,7 @@ void NoteCollection::printNote(const int& index) const {
         const auto note = collection.at(index);
         cout << "Title: " << note->getTitle() << endl;
         cout << "Content: " << note->getContent() << endl;
-        cout << "Locked: " << note->getLocked() << endl << endl;
+        cout << "Locked: " << note->getLocked() << endl;
     }else {
         throw std::out_of_range("La nota non è stata trovata");
     }
@@ -141,6 +151,40 @@ bool NoteCollection::isDuplicated(const shared_ptr<Note>& note) const {
         return false;
     }
     return true;
+}
+
+vector<shared_ptr<Note>> NoteCollection::searchBy(function<bool(const shared_ptr<Note> &)> predicate) const {
+    vector<shared_ptr<Note>> result;
+    copy_if(collection.begin(), collection.end(), back_inserter(result), std::move(predicate));
+    return result;
+}
+
+vector<shared_ptr<Note> > NoteCollection::searchLocked() const {
+    return searchBy([](const shared_ptr<Note>& note) {
+        return note -> getLocked();
+    });
+}
+
+vector<shared_ptr<Note>> NoteCollection::searchPinned() const {
+    return searchBy([](const shared_ptr<Note>& note) {
+            return note -> getPinned();
+    });
+}
+
+vector<shared_ptr<Note>> NoteCollection::searchNEmpty() const {
+    return searchBy([](const shared_ptr<Note>& note) {
+        return !note -> getContent().empty();
+    });
+}
+
+void NoteCollection::printSearchResult(const vector<shared_ptr<Note>> &results) const {
+    cout << endl;
+    int index = 0;
+    for (const auto& note : results) {
+        cout << endl;
+        cout << "Note " << index << ": " << note -> getTitle() << endl;
+        index++;
+    }
 }
 
 void NoteCollection::attach(shared_ptr<Observer> observer) {
