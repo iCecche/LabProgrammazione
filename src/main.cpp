@@ -28,7 +28,7 @@ int main() {
         cout << "2. Create Note\n";
         cout << "3. Print Collections\n";
         cout << "4. Print Note by Index\n";
-        cout << "5. Print Note by Predicate\n";
+        cout << "5. Search Note by (condition)\n";
         cout << "6. Edit Note\n";
         cout << "7. Remove Note from Collection\n";
         cout << "8. Lock/Unlock Note\n";
