@@ -32,7 +32,7 @@ string Note::getContent() const{
     return content;
 }
 
-void Note::setLocked(const bool& locked) {
+void Note::setLocked(bool locked) {
     this->locked = locked;
 }
 

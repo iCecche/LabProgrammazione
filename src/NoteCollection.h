@@ -17,22 +17,19 @@ class NoteCollection final : public Observable {
     explicit NoteCollection(const string& collectionName);
     ~NoteCollection() override = default;
     void addNote(const shared_ptr<Note> &newNote);
-    void removeNote(const int &index);
-    void moveNote(const int& index,  const shared_ptr<NoteCollection>& origin, const shared_ptr<NoteCollection>& destination);
+    void removeNote(int index);
+    void moveNote(int index,  const shared_ptr<NoteCollection>& origin, const shared_ptr<NoteCollection>& destination);
 
-    shared_ptr<Note> getNote(const int &index) const;
-    void printNote(const int &index) const;
+    shared_ptr<Note> getNote(int index) const;
+    void printNote(int index) const;
     void printAllNotes() const;
 
-    void editNote(const int &index, const optional<string> &newTitle = nullopt, const optional<string> &newContent = nullopt) const;
-    void lockNote(const int &index) const;
-    void pinNote(const int &index) const;
+    void editNote(int index, const optional<string> &newTitle = nullopt, const optional<string> &newContent = nullopt) const;
+    void lockNote(int index) const;
+    void pinNote(int index) const;
 
     unsigned long getNumberOfNotes() const;
     string getCollectionName() const;
-
-    bool isValidMove(const shared_ptr<NoteCollection> &origin) const;
-    bool isDuplicated(const shared_ptr<Note> &note) const;
 
     vector<shared_ptr<Note>> searchLocked() const;
     vector<shared_ptr<Note>> searchPinned() const;
@@ -47,6 +44,8 @@ class NoteCollection final : public Observable {
 private:
 
     vector<shared_ptr<Note>> searchBy(function<bool(const shared_ptr<Note>&)> predicate) const;
+    bool isValidMove(const shared_ptr<NoteCollection> &origin) const;
+    bool isDuplicated(const shared_ptr<Note> &note) const;
 
     string collectionName;
     vector<shared_ptr<Note>> collection;

@@ -18,7 +18,7 @@ void NoteCollection::addNote(const shared_ptr<Note>& newNote) {
     notify(); // notifica observer del cambiamento
 }
 
-void NoteCollection::removeNote(const int &index) {
+void NoteCollection::removeNote(int index) {
 
     if (index >= 0 && index < collection.size()) {
 
@@ -34,7 +34,7 @@ void NoteCollection::removeNote(const int &index) {
     }
 }
 
-void NoteCollection::moveNote(const int& index,  const shared_ptr<NoteCollection>& origin, const shared_ptr<NoteCollection>& destination) {
+void NoteCollection::moveNote(int index,  const shared_ptr<NoteCollection>& origin, const shared_ptr<NoteCollection>& destination) {
     if (index < 0 || index >= collection.size()) {
         throw std::out_of_range("La nota non è stata trovata");
     }
@@ -57,7 +57,7 @@ void NoteCollection::moveNote(const int& index,  const shared_ptr<NoteCollection
     }
 }
 
-void NoteCollection::editNote(const int &index, const optional<string>& newTitle, const optional<string>& newContent) const {
+void NoteCollection::editNote(int index, const optional<string>& newTitle, const optional<string>& newContent) const {
 
     if (index < 0 || index >= collection.size()) {
         throw std::out_of_range("La nota non è stata trovata");
@@ -74,7 +74,7 @@ void NoteCollection::editNote(const int &index, const optional<string>& newTitle
     }
 }
 
-void NoteCollection::lockNote(const int &index) const {
+void NoteCollection::lockNote(int index) const {
     if (index < 0 || index >= collection.size()) {
         throw std::out_of_range("La nota non è stata trovata");
     }
@@ -85,7 +85,7 @@ void NoteCollection::lockNote(const int &index) const {
     cout << (isLocked ? "Unlocked" : "Locked") << " note " << note -> getTitle() << endl;
 }
 
-void NoteCollection::pinNote(const int &index) const {
+void NoteCollection::pinNote(int index) const {
     if (index < 0 || index >= collection.size()) {
         throw std::out_of_range("La nota non è stata trovata");
     }
@@ -96,7 +96,7 @@ void NoteCollection::pinNote(const int &index) const {
 }
 
 
-shared_ptr<Note> NoteCollection::getNote(const int& index) const {
+shared_ptr<Note> NoteCollection::getNote(int index) const {
 
     if (index >= 0 && index < collection.size()) {
         return collection.at(index);
@@ -104,7 +104,7 @@ shared_ptr<Note> NoteCollection::getNote(const int& index) const {
     return nullptr;
 }
 
-void NoteCollection::printNote(const int& index) const {
+void NoteCollection::printNote(int index) const {
     cout << endl;
     if (index >= 0 && index < collection.size()) {
         const auto note = collection.at(index);

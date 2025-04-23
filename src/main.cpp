@@ -9,7 +9,7 @@ shared_ptr<Note> create_note();
 shared_ptr<NoteCollection> create_note_collection();
 int int_prompt(const string& message);
 string string_prompt(const string& message);
-void print_collections(const vector<shared_ptr<NoteCollection>> &collections, const int &from_index = 0);
+void print_collections(const vector<shared_ptr<NoteCollection>> &collections, int from_index = 0);
 
 int main() {
     vector<shared_ptr<NoteCollection>> collections;
@@ -237,7 +237,7 @@ string string_prompt(const string& message) {
 
 // indice necessario per non stampare collezione importante tra i possibili owners quando si crea una nuova nota ->
 // 'important' non può possedere una nota ma può solo 'ospitarla'
-void print_collections(const vector<shared_ptr<NoteCollection>> &collections, const int &from_index) {
+void print_collections(const vector<shared_ptr<NoteCollection>> &collections, int from_index) {
     cout << endl;
     for (int i = from_index; i < collections.size(); ++i) {
         cout << i << ") " << collections[i]->getCollectionName() << endl;

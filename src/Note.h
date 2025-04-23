@@ -19,7 +19,7 @@ public:
     void setContent(const string& content);
 
     bool getLocked() const;
-    void setLocked(const bool& locked);
+    void setLocked(bool locked);
 
     void setPinned(bool value);
     bool getPinned() const;
