@@ -5,7 +5,7 @@
 #include "Note.h"
 using namespace std;
 
-Note::Note(const string& title, const string& content, const bool locked, const bool pinned) {
+Note::Note(const string& title, const string& content, bool locked, bool pinned) {
     this->title = title;
     this->content = content;
     this->locked = locked;
