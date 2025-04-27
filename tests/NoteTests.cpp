@@ -7,7 +7,7 @@
 #include "gtest/gtest.h"
 
 TEST(Note, Create_Note_Successfully) {
-    const auto note = new Note("Note1", "Content1", false, false);
+    const auto note = make_unique<Note>("Note1", "Content1", false, false);
     EXPECT_EQ(note -> getTitle(), "Note1");
     EXPECT_EQ(note -> getContent(), "Content1");
     EXPECT_EQ(note -> getLocked(), false);
@@ -15,7 +15,7 @@ TEST(Note, Create_Note_Successfully) {
 }
 
 TEST(Note, Note_Public_Methods) {
-    const auto note = new Note("Note1", "Content1", false, false);
+    const auto note = make_unique<Note>("Note1", "Content1", false, false);
 
     note -> setLocked(true);
     note -> setTitle("NewTitle");
@@ -26,7 +26,7 @@ TEST(Note, Note_Public_Methods) {
 }
 
 TEST(Note, Pin_Note_Successfully) {
-    const auto note = new Note("Note1", "Content1", false, false);
+    const auto note = make_unique<Note>("Note1", "Content1", false, false);
     note -> setPinned(true);
 
     EXPECT_EQ(note -> getPinned(), true);
