@@ -37,8 +37,8 @@ class NoteCollection final : public Observable {
 
     void printSearchResult(const vector<shared_ptr<Note>> &searchResult) const;
 
-    void attach(shared_ptr<Observer> observer) override;
-    void detach(shared_ptr<Observer> observer) override;
+    void attach(const shared_ptr<Observer>& observer) override;
+    void detach(const shared_ptr<Observer>& observer) override;
     void notify() override;
 
 private:

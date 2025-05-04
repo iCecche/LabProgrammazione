@@ -186,11 +186,11 @@ void NoteCollection::printSearchResult(const vector<shared_ptr<Note>> &results) 
     }
 }
 
-void NoteCollection::attach(shared_ptr<Observer> observer) {
+void NoteCollection::attach(const shared_ptr<Observer>& observer) {
     observers.push_back(observer);
 }
 
-void NoteCollection::detach(shared_ptr<Observer> observer) {
+void NoteCollection::detach(const shared_ptr<Observer>& observer) {
     if (const auto& it = find(observers.begin(), observers.end(), observer); it != observers.end()) {
         observers.erase(it);
     }
